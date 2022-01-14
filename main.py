@@ -10,6 +10,9 @@ import colorama
 from threading import Thread
 
 # init the colorama module
+from requests import ConnectTimeout
+from urllib3.exceptions import ConnectTimeoutError
+
 colorama.init()
 
 GREEN = colorama.Fore.GREEN
@@ -61,7 +64,7 @@ def get_all_website_links(url):
     urls = set()
     # domain name of the URL without the protocol
     domain_name = urlparse(url).netloc
-    soup = BeautifulSoup(requests.get(url, timeout=(3.05, 5)).content, "html.parser")
+    soup = BeautifulSoup(requests.get(url, timeout=(6.05, 10)).content, "html.parser")
     for a_tag in soup.findAll("a"):
         href = a_tag.attrs.get("href")
         if href == "" or href is None:
@@ -110,7 +113,6 @@ def crawl(url, max_urls=40):
     """
     global total_urls_visited, visited_products
 
-
     for itemCatalog in skipped:
         if itemCatalog in url:
             if "/i/" in url and visited_products < MAX_PRODUCTS_TO_VISIT:
@@ -135,8 +137,8 @@ def crawl(url, max_urls=40):
                 pass
 
             crawl(link, max_urls=max_urls)
-    except Exception as e:
-        print(f"{RED}[!] Timeout error for link \n{e}{RESET}")
+    except ConnectTimeout as e:
+        print(f"{RED}[!] Timeout error for link {url}{RESET}")
 
 
 if __name__ == "__main__":
