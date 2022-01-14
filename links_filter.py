@@ -18,7 +18,7 @@ categories_repeats = {
 }
 
 
-def parse_path_by_pos(url, position):
+def find_main_route_in_path(url):
     detect_by_first = [
         "catalog",
         "upload",
@@ -54,7 +54,7 @@ def clear_repeating_links(links):
     for link in links:
         link = link.rstrip()
         try:
-            route = parse_path_by_pos(link, 1)
+            route = find_main_route_in_path(link)
 
             if route in categories_repeats:
                 # current repeats count
@@ -70,12 +70,22 @@ def clear_repeating_links(links):
     return shorted_links
 
 
+def remove_trailing_slash_in_list(list):
+    new_list = []
+    for item in list:
+        if item[len(item) - 1] == "/":
+            item = item[:-1]
+        new_list.append(item)
+    return new_list
+
+
 def generate_filtered_file():
     all_links = set(open(FILE_NAME, 'r', encoding='utf-8').readlines())
-    cleared_links = clear_repeating_links(all_links)
+    all_links = clear_repeating_links(all_links)
+    all_links = remove_trailing_slash_in_list(all_links)
 
     with open(f"filtered_links.txt", "w") as f:
-        for external_link in cleared_links:
+        for external_link in all_links:
             print(external_link.strip(), file=f)
 
 
