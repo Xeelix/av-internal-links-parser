@@ -33,7 +33,7 @@ isProductParsed = False
 
 total_urls_visited = 0
 
-MAX_PRODUCTS_TO_VISIT = 5
+MAX_PRODUCTS_TO_VISIT = 1
 visited_products = 0
 
 skipped = [
@@ -137,7 +137,7 @@ def crawl(url, max_urls=40):
                 pass
 
             crawl(link, max_urls=max_urls)
-    except ConnectTimeout as e:
+    except Exception as e:
         print(f"{RED}[!] Timeout error for link {url}{RESET}")
 
 
