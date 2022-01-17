@@ -70,23 +70,39 @@ def clear_repeating_links(links):
     return shorted_links
 
 
-def remove_trailing_slash_in_list(list):
+def remove_trailing_slash_in_list(links):
     new_list = []
-    for item in list:
-        if item[len(item) - 1] == "/":
-            item = item[:-1]
-        new_list.append(item)
+    for link in links:
+        if link[len(link) - 1] == "/":
+            link = link[:-1]
+        new_list.append(link)
     return new_list
+
+
+def filter_only_one_domain(links):
+    target_hostname = "av.ru"
+    target_scheme = "https"
+
+    output_links = []
+    for link in links:
+        path = urlparse(link)
+        if path.scheme == target_scheme and path.hostname == target_hostname:
+            output_links.append(link)
+
+    return output_links
 
 
 def generate_filtered_file():
     all_links = set(open(FILE_NAME, 'r', encoding='utf-8').readlines())
     all_links = clear_repeating_links(all_links)
     all_links = remove_trailing_slash_in_list(all_links)
+    all_links = filter_only_one_domain(all_links)
 
-    with open(f"filtered_links.txt", "w") as f:
+
+    with open("filtered_links.txt", "w") as f:
         for external_link in all_links:
             print(external_link.strip(), file=f)
 
+    print("Filtering was successful")
 
 generate_filtered_file()
