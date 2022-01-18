@@ -13,6 +13,8 @@ from threading import Thread
 from requests import ConnectTimeout
 from urllib3.exceptions import ConnectTimeoutError
 
+target_domain = "stage.av.ru"
+
 colorama.init()
 
 GREEN = colorama.Fore.GREEN
@@ -98,7 +100,7 @@ def get_all_website_links(url):
         internal_urls.add(href)
         internal_urls_dict.append(href)
 
-        with open(f"av.ru_after.txt", "a") as f:
+        with open(f"{target_domain}_after.txt", "a") as f:
             for internal_link in urls:
                 print(internal_link.strip(), file=f)
     return urls
@@ -145,10 +147,10 @@ if __name__ == "__main__":
     start_time = datetime.now()
 
     # save the external links to a file
-    with open(f"av.ru_after.txt", "w") as f:
+    with open(f"{target_domain}_after.txt", "w") as f:
         print(f"{GRAY}[+] File was updated{RESET}")
 
-    url = "https://av.ru"
+    url = f"https://{target_domain}"
     max_urls = 50
 
     all_base_links = get_all_website_links(url)
@@ -178,7 +180,7 @@ if __name__ == "__main__":
         for external_link in globalData:
             print(external_link.strip(), file=f)
 
-    uniqlines = set(open(f"av.ru_after.txt", 'r', encoding='utf-8').readlines())
+    uniqlines = set(open(f"{target_domain}_after.txt", 'r', encoding='utf-8').readlines())
     done_file = open("file_result.txt", 'w', encoding='utf-8').writelines(set(uniqlines))
 
     print("[?] Taken time:", datetime.now() - start_time)
