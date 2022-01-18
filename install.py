@@ -13,7 +13,7 @@ def install(name):
 
 def main():
 
-    my_packages = ['requests', 'clint', 'faker', 'selenium', 'bs4', "lxml", "colorama"]
+    my_packages = ['requests', 'clint', 'faker', 'selenium', 'beautifulsoup4', "lxml", "colorama"]
 
     installed_pr = []
 
