@@ -3,9 +3,12 @@ import time
 from urllib.parse import urlparse
 from datetime import datetime
 
+from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
+
 from __colors__.colors import *
 
-from selenium import webdriver
+from main import target_domain
 
 success = 0
 failed = 0
@@ -27,17 +30,17 @@ categories_with_tailing = [
 
 # 9
 custom_urls_to_watch = {
-    "https://av.ru/food/all/": "https://av.ru/catalog",
-    "https://av.ru/.htpasswd": "https://av.ru/",
-    "https://av.ru/.htpasswd'": "https://av.ru/",
-    "https://av.ru/.nsconfig": "https://av.ru/",
-    "https://av.ru/...": "https://av.ru/",
-    "https://av.ru/.rhosts": "https://av.ru/",
-    "https://av.ru/.bootstraprc": "https://av.ru/",
-    "https://av.ru/.htaccess": "https://av.ru/",
-    "https://av.ru/.subversion": "https://av.ru/",
-    "https://av.ru/.bashrc": "https://av.ru/",
-    "https://av.ru/.gist": "https://av.ru/",
+    f"https://{target_domain}/food/all/": f"https://{target_domain}/catalog",
+    f"https://{target_domain}/.htpasswd": f"https://{target_domain}/",
+    f"https://{target_domain}/.htpasswd'": f"https://{target_domain}/",
+    f"https://{target_domain}/.nsconfig": f"https://{target_domain}/",
+    f"https://{target_domain}/...": f"https://{target_domain}/",
+    f"https://{target_domain}/.rhosts": f"https://{target_domain}/",
+    f"https://{target_domain}/.bootstraprc": f"https://{target_domain}/",
+    f"https://{target_domain}/.htaccess": f"https://{target_domain}/",
+    f"https://{target_domain}/.subversion": f"https://{target_domain}/",
+    f"https://{target_domain}/.bashrc": f"https://{target_domain}/",
+    f"https://{target_domain}/.gist": f"https://{target_domain}/",
 }
 
 
@@ -120,12 +123,15 @@ def check_link(driver, link_from_file):
     global success
     global failed
 
+    isCustom = False
+
     driver.get(link_from_file)
     actual_link = driver.current_url
 
     expected_link = None
     if link_from_file in custom_urls_to_watch:
         expected_link = custom_urls_to_watch[link_from_file]
+        isCustom = True
     else:
         expected_link = link_rules(actual_link)
 
@@ -133,6 +139,7 @@ def check_link(driver, link_from_file):
         print(fr + "[-] " + f'Test failed:\n\texpected: {expected_link}\n\tactual: {actual_link}')
         failed += 1
     else:
+        if isCustom: expected_link = link_from_file
         print(fg + "[+] " + f'Test success:\n\texpected: {expected_link}\n\tactual: {actual_link}')
         success += 1
 
@@ -145,12 +152,17 @@ def start_tests():
     #              "https://av.ru", "https://av.rus/"]
 
     driver = initialize_driver()
+    driver.set_page_load_timeout(20)
     # driver = 123
 
     for link in all_links:
         if link[-1] == "\n":
             link = link[:-1]
-        check_link(driver, link)
+        try:
+            check_link(driver, link)
+        except TimeoutException as e:
+            print(fr + "[-] " + f'Test failed:\n\tTimeoutException: {link}')
+            continue
 
     print("\n")
     print("Result: ")

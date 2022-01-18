@@ -3,3 +3,6 @@ venv
 /webdriver/
 *.txt
 *.log
+/.pytest_cache/
+*.pyc
+.DS_Store
