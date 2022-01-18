@@ -1,6 +1,7 @@
 import random
 from urllib.parse import urlparse, urljoin
 
+from main import target_domain
 from selenium_test import add_end_trailing, custom_urls_to_watch
 
 FILE_NAME = "file_result.txt"
@@ -68,7 +69,6 @@ def find_main_route_in_path(url):
 def clear_repeating_links(links):
     shorted_links = set()
 
-    test = "https://av.ru/about/tenders/"
     for link in links:
         link = link.rstrip()
         try:
@@ -98,7 +98,7 @@ def remove_trailing_slash_in_list(links):
 
 
 def filter_only_one_domain(links):
-    target_hostname = "av.ru"
+    target_hostname = target_domain
     target_scheme = "https"
 
     output_links = []
