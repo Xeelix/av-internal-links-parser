@@ -1,7 +1,6 @@
 import re
 import time
-import pytest
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse
 from datetime import datetime
 
 from __colors__.colors import *
@@ -117,36 +116,36 @@ def link_rules(actual_link):
     return expected_link
 
 
-
 def check_link(driver, link_from_file):
     global success
     global failed
 
-    # driver.get(link_from_file)
-    # expected_link = driver.current_url
+    driver.get(link_from_file)
+    actual_link = driver.current_url
 
     expected_link = None
     if link_from_file in custom_urls_to_watch:
         expected_link = custom_urls_to_watch[link_from_file]
     else:
-        expected_link = link_rules(link_from_file)
+        expected_link = link_rules(actual_link)
 
-    if link_from_file != expected_link:
-        print(fr + "[-] " + f'Test failed:\n\texpected: {expected_link}\n\tactual: {link_from_file}')
+    if actual_link != expected_link:
+        print(fr + "[-] " + f'Test failed:\n\texpected: {expected_link}\n\tactual: {actual_link}')
         failed += 1
     else:
-        print(fg + "[+] " + f'Test success:\n\texpected: {expected_link}\n\tactual: {link_from_file}')
+        print(fg + "[+] " + f'Test success:\n\texpected: {expected_link}\n\tactual: {actual_link}')
         success += 1
 
     return expected_link
 
 
 def start_tests():
-    # all_links = read_links('filtered_links.txt')
-    all_links = ["https://av.ru/.htpasswd", "https://av.ru/collections/gift_tea_sets/", "https://av.ru", "https://av.ru", "https://av.rus/"]
+    all_links = read_links('filtered_links.txt')
+    # all_links = ["https://av.ru/.htpasswd", "https://av.ru/collections/gift_tea_sets/", "https://av.ru",
+    #              "https://av.ru", "https://av.rus/"]
 
-    # driver = initialize_driver()
-    driver = 123
+    driver = initialize_driver()
+    # driver = 123
 
     for link in all_links:
         if link[-1] == "\n":

@@ -1,3 +1,4 @@
+import random
 from urllib.parse import urlparse, urljoin
 
 from selenium_test import add_end_trailing, custom_urls_to_watch
@@ -112,6 +113,8 @@ def filter_only_one_domain(links):
 def set_links_by_rules(links):
     """Generating links for tests"""
     output_links = []
+    MAX_LINKS_WITH_TRAILING = 10
+    links_with_trailings_count = 0
 
     for link in links:
         parsed_url = urlparse(link)
@@ -121,6 +124,13 @@ def set_links_by_rules(links):
         if len(splitted_url_paths) >= 1:
             if splitted_url_paths[0] in categories_with_tailing:
                 link = add_end_trailing(link)
+
+            if (splitted_url_paths[0] in categories_without_tailing or splitted_url_paths[
+                0] in categories_with_tailing) and links_with_trailings_count < MAX_LINKS_WITH_TRAILING:
+                # Generating trailing
+                generated_link = generate_trailing_link(parsed_url, splitted_url_paths)
+                output_links.append(generated_link)
+                links_with_trailings_count += 1
         else:
             link = add_end_trailing(link)
 
@@ -133,6 +143,19 @@ def add_custom_urls_to_array(links):
     for watched in custom_urls_to_watch:
         links.append(watched)
     return links
+
+
+def generate_trailing_link(parsed_url, splitted_url_paths):
+    trailings = "/" * random.randint(2, 8)
+
+    generated_path = ""
+    for id, val in enumerate(splitted_url_paths):
+        if id == 0:
+            val += trailings
+        generated_path += val + "/"
+
+    generated_link = f"{parsed_url.scheme}://{parsed_url.hostname}/{generated_path}"
+    return generated_link
 
 
 def generate_filtered_file():
