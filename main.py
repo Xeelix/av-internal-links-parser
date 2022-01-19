@@ -1,4 +1,5 @@
 import codecs
+import os
 from datetime import datetime
 import time
 from multiprocessing import Pool
@@ -13,6 +14,7 @@ from threading import Thread
 from requests import ConnectTimeout
 from urllib3.exceptions import ConnectTimeoutError
 
+files_folder = "./parsed_links"
 target_domain = "stage.av.ru"
 
 colorama.init()
@@ -66,7 +68,7 @@ def get_all_website_links(url):
     urls = set()
     # domain name of the URL without the protocol
     domain_name = urlparse(url).netloc
-    soup = BeautifulSoup(requests.get(url, timeout=(6.05, 10)).content, "html.parser")
+    soup = BeautifulSoup(requests.get(url, timeout=(10, 15)).content, "html.parser")
     for a_tag in soup.findAll("a"):
         href = a_tag.attrs.get("href")
         if href == "" or href is None:
@@ -100,7 +102,7 @@ def get_all_website_links(url):
         internal_urls.add(href)
         internal_urls_dict.append(href)
 
-        with open(f"{target_domain}_after.txt", "a") as f:
+        with open(f"{files_folder}/{target_domain}_after.txt", "a") as f:
             for internal_link in urls:
                 print(internal_link.strip(), file=f)
     return urls
@@ -143,17 +145,29 @@ def crawl(url, max_urls=40):
         print(f"{RED}[!] Timeout error for link {url}{RESET}")
 
 
+def check_directory_existing_and_create(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+
 if __name__ == "__main__":
     start_time = datetime.now()
 
+    check_directory_existing_and_create(files_folder)
+
     # save the external links to a file
-    with open(f"{target_domain}_after.txt", "w") as f:
+    with open(f"{files_folder}/{target_domain}_after.txt", "w") as f:
         print(f"{GRAY}[+] File was updated{RESET}")
 
     url = f"https://{target_domain}"
     max_urls = 50
 
     all_base_links = get_all_website_links(url)
+    tort_links = get_all_website_links(f"https://{target_domain}/tort/")
+
+    for i in tort_links:
+        all_base_links.add(i)
+
 
     with Pool(THREADS_COUNT) as p:
         p.map(crawl, all_base_links)
@@ -166,21 +180,21 @@ if __name__ == "__main__":
     domain_name = urlparse(url).netloc
 
     # save the internal links to a file
-    with open(f"{domain_name}_internal_links.txt", "w") as f:
+    with open(f"{files_folder}/{domain_name}_internal_links.txt", "w") as f:
         for internal_link in internal_urls:
             print(internal_link.strip(), file=f)
 
     # save the external links to a file
-    with open(f"{domain_name}_external_links.txt", "w") as f:
+    with open(f"{files_folder}/{domain_name}_external_links.txt", "w") as f:
         for external_link in external_urls:
             print(external_link.strip(), file=f)
 
     # save the external links to a file
-    with open(f"{domain_name}_global.txt", "w") as f:
+    with open(f"{files_folder}/{domain_name}_global.txt", "w") as f:
         for external_link in globalData:
             print(external_link.strip(), file=f)
 
-    uniqlines = set(open(f"{target_domain}_after.txt", 'r', encoding='utf-8').readlines())
-    done_file = open("file_result.txt", 'w', encoding='utf-8').writelines(set(uniqlines))
+    uniqlines = set(open(f"{files_folder}/{target_domain}_after.txt", 'r', encoding='utf-8').readlines())
+    done_file = open(f"{files_folder}/file_result.txt", 'w', encoding='utf-8').writelines(set(uniqlines))
 
     print("[?] Taken time:", datetime.now() - start_time)
