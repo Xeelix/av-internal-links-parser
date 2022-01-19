@@ -1,5 +1,6 @@
 import re
 import time
+import links_filter
 from urllib.parse import urlparse
 from datetime import datetime
 
@@ -13,6 +14,7 @@ from main import target_domain, files_folder, GRAY
 success = 0
 failed = 0
 undefined_links = 0
+errors_links = 0
 
 # Links from test cases
 categories_without_tailing = [
@@ -99,6 +101,7 @@ def add_end_trailing(link):
 
 # Get right link
 def link_rules(actual_link):
+    actual_link = actual_link.lower()
     parsed_url = urlparse(actual_link)
     splitted_url = parsed_url.path.split("/")
     splitted_url_paths = list(filter(lambda x: len(x) > 0, splitted_url))  # Filter empty
@@ -120,7 +123,7 @@ def link_rules(actual_link):
     return expected_link
 
 
-def check_link(driver, link_from_file):
+def check_link(driver, link_from_file, length_info):
     global success
     global failed
     global undefined_links
@@ -131,29 +134,48 @@ def check_link(driver, link_from_file):
     driver.get(link_from_file)
     actual_link = driver.current_url
 
+    parsed_url_from_file = urlparse(link_from_file)
+    splitted_url_from_file = parsed_url_from_file.path.split("/")
+    splitted_url_paths_from_file = list(filter(lambda x: len(x) > 0, splitted_url_from_file))  # Filter empty
+
+    # If url - is custom
     if link_from_file in custom_urls_to_watch:
         expected_link = custom_urls_to_watch[link_from_file]
+        isCustom = True
+    # If /home or /index.php or /index in path
+    elif splitted_url_paths_from_file[-1] in links_filter.categories_indexing:
+        expected_link = link_rules(actual_link)
         isCustom = True
     else:
         expected_link = link_rules(actual_link)
 
     if expected_link is None:
-        print(GRAY + "[?] " + f'Undefined Link: {actual_link}')
+        print(GRAY + f"({length_info[0] + 1} of {length_info[1]}) [?] Undefined Link: {actual_link}")
         undefined_links += 1
         return
 
+    expected_link = expected_link.lower()
+
     if actual_link != expected_link:
-        print(fr + "[-] " + f'Test failed:\n\texpected: {expected_link}\n\tactual: {actual_link}')
+        print(
+            fr + f"({length_info[0] + 1} of {length_info[1]}) [-] Test failed:\n\texpected: {expected_link}\n\tactual: {actual_link}")
         failed += 1
     else:
         if isCustom: expected_link = link_from_file
-        print(fg + "[+] " + f'Test success:\n\texpected: {expected_link}\n\tactual: {actual_link}')
+        print(
+            fg + f"({length_info[0] + 1} of {length_info[1]}) [+] Test success:\n\texpected: {expected_link}\n\tactual: {actual_link}")
         success += 1
 
     return expected_link
 
 
+def get_formatted_precent(value, count):
+    percent = value * 100 / count
+    return f"{percent: .0f}%"
+
+
 def start_tests():
+    global errors_links
     all_links = read_links('filtered_links.txt')
     # all_links = ["https://av.ru/.htpasswd", "https://av.ru/collections/gift_tea_sets/", "https://av.ru",
     #              "https://av.ru", "https://av.rus/"]
@@ -162,24 +184,27 @@ def start_tests():
     driver.set_page_load_timeout(20)
     # driver = 123
 
-    for link in all_links:
+    for index, link in enumerate(all_links):
         if link[-1] == "\n":
             link = link[:-1]
         try:
-            check_link(driver, link)
+            check_link(driver, link, [index, len(all_links)])
         except TimeoutException as e:
-            print(fr + "[-] " + f'Test failed:\n\tTimeoutException: {link}')
+            print(fr + f"({index + 1} of {len(all_links)}) [-] Test failed:\n\tTimeoutException: {link}")
+            errors_links += 1
             continue
         except Exception as e:
             print(e)
+            errors_links += 1
             continue
 
     print("\n")
     print("Result: ")
-    print(fg + f'Successfully: {success}')
-    print(fr + f'Failed: {failed}')
-    print(GRAY + f'Undefined: {undefined_links}')
-    print(f'Total: {failed + success + undefined_links}')
+    print(fg + f'Successfully: {success} ({get_formatted_precent(success, len(all_links))})')
+    print(fr + f'Failed: {failed} ({get_formatted_precent(failed, len(all_links))})')
+    print(GRAY + f'Undefined: {undefined_links} ({get_formatted_precent(undefined_links, len(all_links))})')
+    print(fr + f'Exception links: {errors_links} ({get_formatted_precent(errors_links, len(all_links))})')
+    print(f'Total: {failed + success + undefined_links + errors_links}')
 
 
 # start_tests()

@@ -1,11 +1,16 @@
 import random
+import re
 from urllib.parse import urlparse, urljoin
 
 from main import target_domain, files_folder
-from selenium_test import add_end_trailing, custom_urls_to_watch
+import selenium_test
+
+# from selenium_test import add_end_trailing, custom_urls_to_watch
 
 FILE_NAME = "file_result.txt"
 MAX_REPEATS_COUNT = 5
+
+upper_case_count = -10
 
 categories_repeats = {
     "/i/": -10,
@@ -37,6 +42,12 @@ categories_without_tailing = [
     "about",  # 5
     "tort",  # 5
 ]
+
+categories_indexing = {
+    "index.php": 0,
+    "index.html": 0,
+    "home": 0,
+}
 
 
 def find_main_route_in_path(url):
@@ -129,7 +140,7 @@ def set_links_by_rules(links):
 
         if len(splitted_url_paths) >= 1:
             if splitted_url_paths[0] in categories_with_tailing:
-                link = add_end_trailing(link)
+                link = selenium_test.add_end_trailing(link)
 
             if (splitted_url_paths[0] in categories_without_tailing or splitted_url_paths[
                 0] in categories_with_tailing) and links_with_trailings_count < MAX_LINKS_WITH_TRAILING:
@@ -138,7 +149,10 @@ def set_links_by_rules(links):
                 output_links.append(generated_link)
                 links_with_trailings_count += 1
         else:
-            link = add_end_trailing(link)
+            link = selenium_test.add_end_trailing(link)
+
+        if "tel:" in link:
+            continue
 
         output_links.append(link)
 
@@ -146,7 +160,7 @@ def set_links_by_rules(links):
 
 
 def add_custom_urls_to_array(links):
-    for watched in custom_urls_to_watch:
+    for watched in selenium_test.custom_urls_to_watch:
         links.append(watched)
     return links
 
@@ -164,6 +178,64 @@ def generate_trailing_link(parsed_url, splitted_url_paths):
     return generated_link
 
 
+def add_indexing_links_to_array(links):
+    output_array = []
+
+    for link in links:
+        parsed_url = urlparse(link)
+        splitted_url = parsed_url.path.split("/")
+        splitted_url_paths = list(filter(lambda x: len(x) > 0, splitted_url))  # Filter empty
+
+        isMultiTrailing = re.search(r"/{3,}", link)
+
+        if isMultiTrailing:
+            continue
+
+        if len(splitted_url_paths) and splitted_url_paths[0] in categories_without_tailing:
+            for index_category in categories_indexing:
+                if categories_indexing[index_category] < MAX_REPEATS_COUNT:
+                    generated_link = link
+                    generated_link += f"/{index_category}"
+                    output_array.append(generated_link)
+                    categories_indexing[index_category] += 1
+
+    links += output_array
+
+    return links
+
+
+def add_uppercase_links_to_array(links):
+    global upper_case_count
+    output_array = []
+
+    for link in links:
+        parsed_url = urlparse(link)
+        splitted_url = parsed_url.path.split("/")
+        splitted_url_paths = list(filter(lambda x: len(x) > 0, splitted_url))  # Filter empty
+
+        isMultiTrailing = re.search(r"/{3,}", link)
+
+        if isMultiTrailing:
+            continue
+
+        if upper_case_count < MAX_REPEATS_COUNT and len(splitted_url_paths) >= 1 and splitted_url_paths[0] != "i" and \
+                splitted_url_paths[
+                    0] in categories_without_tailing:
+            upper_path = ""
+            for i in parsed_url.path:
+                if random.randint(0, 3) == 1:
+                    i = i.upper()
+                upper_path += i
+
+            generated_uppercase_link = parsed_url.scheme + "://" + parsed_url.netloc + upper_path
+            output_array.append(generated_uppercase_link)
+            upper_case_count += 1
+
+    links += output_array
+
+    return links
+
+
 def generate_filtered_file():
     all_links = set(open(f"{files_folder}/{FILE_NAME}", 'r', encoding='utf-8').readlines())
     all_links = clear_repeating_links(all_links)
@@ -171,6 +243,8 @@ def generate_filtered_file():
     all_links = set(filter_only_one_domain(all_links))
     all_links = set_links_by_rules(all_links)
     all_links = add_custom_urls_to_array(all_links)
+    all_links = add_indexing_links_to_array(all_links)
+    all_links = add_uppercase_links_to_array(all_links)
 
     with open(f"{files_folder}/filtered_links.txt", "w") as f:
         for external_link in all_links:
@@ -179,4 +253,5 @@ def generate_filtered_file():
     print("Filtering was successful")
 
 
-generate_filtered_file()
+if __name__ == "__main__":
+    generate_filtered_file()
