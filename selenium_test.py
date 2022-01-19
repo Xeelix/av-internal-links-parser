@@ -8,10 +8,11 @@ from selenium.common.exceptions import TimeoutException
 
 from __colors__.colors import *
 
-from main import target_domain
+from main import target_domain, files_folder, GRAY
 
 success = 0
 failed = 0
+undefined_links = 0
 
 # Links from test cases
 categories_without_tailing = [
@@ -46,7 +47,7 @@ custom_urls_to_watch = {
 
 def read_links(filename):
     links_array = []
-    with open(filename, 'r') as inputfile:
+    with open(f"{files_folder}/{filename}", 'r') as inputfile:
         for line in inputfile:
             links_array.append(line)
 
@@ -122,18 +123,24 @@ def link_rules(actual_link):
 def check_link(driver, link_from_file):
     global success
     global failed
+    global undefined_links
 
     isCustom = False
+    expected_link = None
 
     driver.get(link_from_file)
     actual_link = driver.current_url
 
-    expected_link = None
     if link_from_file in custom_urls_to_watch:
         expected_link = custom_urls_to_watch[link_from_file]
         isCustom = True
     else:
         expected_link = link_rules(actual_link)
+
+    if expected_link is None:
+        print(GRAY + "[?] " + f'Undefined Link: {actual_link}')
+        undefined_links += 1
+        return
 
     if actual_link != expected_link:
         print(fr + "[-] " + f'Test failed:\n\texpected: {expected_link}\n\tactual: {actual_link}')
@@ -163,12 +170,16 @@ def start_tests():
         except TimeoutException as e:
             print(fr + "[-] " + f'Test failed:\n\tTimeoutException: {link}')
             continue
+        except Exception as e:
+            print(e)
+            continue
 
     print("\n")
     print("Result: ")
     print(fg + f'Successfully: {success}')
     print(fr + f'Failed: {failed}')
-    print(f'Total: {failed + success}')
+    print(GRAY + f'Undefined: {undefined_links}')
+    print(f'Total: {failed + success + undefined_links}')
 
 
 # start_tests()

@@ -1,24 +1,26 @@
 import random
 from urllib.parse import urlparse, urljoin
 
-from main import target_domain
+from main import target_domain, files_folder
 from selenium_test import add_end_trailing, custom_urls_to_watch
 
 FILE_NAME = "file_result.txt"
-MAX_REPEATS_COUNT = 4
+MAX_REPEATS_COUNT = 5
 
 categories_repeats = {
-    "/i/": 0,
+    "/i/": -10,
     "/g/": 0,
     "/files/": 0,
-    "/catalog/": 0,
-    "/collections/": 0,
-    # "/ideas/": 0,
+    "/collections/": -10,
     "/brands/": 0,
     "/news/": 0,
-    "/press/": 0,
-    "/about/": 0,
     "/upload/": 0,
+    "/press/": 0,
+    "/catalog/": 0,
+    "/ideas/": -20,
+    "/shops/": 0,
+    "/about/": -20,
+    "/tort/": -10,
 }
 
 # generate Links for test
@@ -42,7 +44,9 @@ def find_main_route_in_path(url):
         "catalog",
         "upload",
         "files",
-        # "ideas",
+        "tort",
+        "ideas",
+        "about",
     ]
 
     left_count = 2
@@ -91,6 +95,8 @@ def clear_repeating_links(links):
 def remove_trailing_slash_in_list(links):
     new_list = []
     for link in links:
+        if len(link) <= 0:
+            continue
         if link[len(link) - 1] == "/":
             link = link[:-1]
         new_list.append(link)
@@ -159,14 +165,14 @@ def generate_trailing_link(parsed_url, splitted_url_paths):
 
 
 def generate_filtered_file():
-    all_links = set(open(FILE_NAME, 'r', encoding='utf-8').readlines())
+    all_links = set(open(f"{files_folder}/{FILE_NAME}", 'r', encoding='utf-8').readlines())
     all_links = clear_repeating_links(all_links)
     all_links = remove_trailing_slash_in_list(all_links)
     all_links = set(filter_only_one_domain(all_links))
     all_links = set_links_by_rules(all_links)
     all_links = add_custom_urls_to_array(all_links)
 
-    with open("filtered_links.txt", "w") as f:
+    with open(f"{files_folder}/filtered_links.txt", "w") as f:
         for external_link in all_links:
             print(external_link.strip(), file=f)
 
