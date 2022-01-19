@@ -15,7 +15,7 @@ from requests import ConnectTimeout
 from urllib3.exceptions import ConnectTimeoutError
 
 files_folder = "./parsed_links"
-target_domain = "stage.av.ru"
+target_domain = "av.ru"
 
 colorama.init()
 
