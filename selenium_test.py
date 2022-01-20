@@ -9,7 +9,7 @@ from selenium.common.exceptions import TimeoutException
 
 from __colors__.colors import *
 
-from main import target_domain, files_folder, GRAY
+from links_parser import target_domain, files_folder, GRAY
 
 success = 0
 failed = 0
@@ -177,8 +177,6 @@ def get_formatted_precent(value, count):
 def start_tests():
     global errors_links
     all_links = read_links('filtered_links.txt')
-    # all_links = ["https://av.ru/.htpasswd", "https://av.ru/collections/gift_tea_sets/", "https://av.ru",
-    #              "https://av.ru", "https://av.rus/"]
 
     driver = initialize_driver()
     driver.set_page_load_timeout(20)
@@ -200,20 +198,24 @@ def start_tests():
 
     print("\n")
     print("Result: ")
-    print(fg + f'Successfully: {success} ({get_formatted_precent(success, len(all_links))})')
-    print(fr + f'Failed: {failed} ({get_formatted_precent(failed, len(all_links))})')
-    print(GRAY + f'Undefined: {undefined_links} ({get_formatted_precent(undefined_links, len(all_links))})')
-    print(fr + f'Exception links: {errors_links} ({get_formatted_precent(errors_links, len(all_links))})')
-    print(f'Total: {failed + success + undefined_links + errors_links}')
+    print(fg + f'\tSuccessfully: {success} ({get_formatted_precent(success, len(all_links))})')
+    print(fr + f'\tFailed: {failed} ({get_formatted_precent(failed, len(all_links))})')
+    print(GRAY + f'\tUndefined: {undefined_links} ({get_formatted_precent(undefined_links, len(all_links))})')
+    print(fr + f'\tException links: {errors_links} ({get_formatted_precent(errors_links, len(all_links))})')
+    print(f'\tTotal: {failed + success + undefined_links + errors_links}')
 
 
-# start_tests()
-if __name__ == "__main__":
+def start_test():
     start_time = datetime.now()
 
     start_tests()
 
     print("[?] Taken time:", datetime.now() - start_time)
+
+
+# start_tests()
+if __name__ == "__main__":
+    start_test()
 #
 # @pytest.fixture()
 # def some_data():
