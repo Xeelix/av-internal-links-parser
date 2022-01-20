@@ -15,14 +15,13 @@ def install(name):
 
 
 def main():
-    print("gm")
     my_packages = ['requests', 'clint', 'faker', 'selenium', 'beautifulsoup4', "lxml", "colorama", "PyInstaller"]
 
     installed_pr = []
 
-    # for package in my_packages:
-    #     install(package)
-    #     print('\n')
+    for package in my_packages:
+        install(package)
+        print('\n')
 
     print('Firefox')
     firefox_ver = get_firefox_version()
