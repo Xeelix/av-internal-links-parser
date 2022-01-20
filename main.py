@@ -1,3 +1,4 @@
+import multiprocessing
 import os
 import install
 import links_parser
@@ -25,6 +26,9 @@ def is_file_existing(file):
 if __name__ == "__main__":
     # Libs Installer
     # choice = input("Press Enter...")
+
+    # Pyinstaller fix
+    multiprocessing.freeze_support()
 
     is_initial_file = is_file_existing(links_parser.optimized_path("prefBrowser.txt"))
     if not is_initial_file:
