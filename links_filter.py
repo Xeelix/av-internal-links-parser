@@ -2,7 +2,7 @@ import random
 import re
 from urllib.parse import urlparse, urljoin
 
-from links_parser import target_domain, files_folder
+import links_parser
 import selenium_test
 
 # from selenium_test import add_end_trailing, custom_urls_to_watch
@@ -115,7 +115,7 @@ def remove_trailing_slash_in_list(links):
 
 
 def filter_only_one_domain(links):
-    target_hostname = target_domain
+    target_hostname = links_parser.target_domain
     target_scheme = "https"
 
     output_links = []
@@ -237,7 +237,8 @@ def add_uppercase_links_to_array(links):
 
 
 def generate_filtered_file():
-    all_links = set(open(f"{files_folder}/{FILE_NAME}", 'r', encoding='utf-8').readlines())
+    all_links = set(open(links_parser.optimized_path(f"{links_parser.files_folder}/{FILE_NAME}"), 'r',
+                         encoding='utf-8').readlines())
     all_links = clear_repeating_links(all_links)
     all_links = remove_trailing_slash_in_list(all_links)
     all_links = set(filter_only_one_domain(all_links))
@@ -246,7 +247,7 @@ def generate_filtered_file():
     all_links = add_indexing_links_to_array(all_links)
     all_links = add_uppercase_links_to_array(all_links)
 
-    with open(f"{files_folder}/filtered_links.txt", "w") as f:
+    with open(links_parser.optimized_path(f"{links_parser.files_folder}/filtered_links.txt"), "w") as f:
         for external_link in all_links:
             print(external_link.strip(), file=f)
 
