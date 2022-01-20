@@ -19,9 +19,9 @@ def main():
 
     installed_pr = []
 
-    for package in my_packages:
-        install(package)
-        print('\n')
+    # for package in my_packages:
+    #     install(package)
+    #     print('\n')
 
     print('Firefox')
     firefox_ver = get_firefox_version()
