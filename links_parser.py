@@ -1,6 +1,7 @@
 import codecs
 import os
 import shutil
+import sys
 from datetime import datetime
 import time
 from multiprocessing import Pool
@@ -15,7 +16,7 @@ from threading import Thread
 from requests import ConnectTimeout
 from urllib3.exceptions import ConnectTimeoutError
 
-files_folder = "./parsed_links"
+files_folder = "parsed_links"
 target_domain = "stage.av.ru"
 
 colorama.init()
@@ -103,7 +104,7 @@ def get_all_website_links(url):
         internal_urls.add(href)
         internal_urls_dict.append(href)
 
-        with open(f"{files_folder}/{target_domain}_after.txt", "a") as f:
+        with open(optimized_path(f"{files_folder}/{target_domain}_after.txt"), "a") as f:
             for internal_link in urls:
                 print(internal_link.strip(), file=f)
     return urls
@@ -147,9 +148,14 @@ def crawl(url, max_urls=40):
 
 
 def check_directory_existing_and_create(directory):
+    directory = optimized_path(directory)
     if os.path.exists(directory):
         shutil.rmtree(directory)  # Clear folder
     os.makedirs(directory)
+
+
+def optimized_path(save_path):
+    return os.path.join(os.path.dirname(sys.executable), save_path)
 
 
 def parse():
@@ -158,7 +164,7 @@ def parse():
     check_directory_existing_and_create(files_folder)
 
     # save the external links to a file
-    with open(f"{files_folder}/{target_domain}_after.txt", "w") as f:
+    with open(optimized_path(f"{files_folder}/{target_domain}_after.txt"), "w") as f:
         print(f"{GRAY}[+] File was updated{RESET}")
 
     url = f"https://{target_domain}"
@@ -181,22 +187,25 @@ def parse():
     domain_name = urlparse(url).netloc
 
     # save the internal links to a file
-    with open(f"{files_folder}/{domain_name}_internal_links.txt", "w") as f:
+    internal_links_path = f"{files_folder}/{domain_name}_internal_links.txt"
+    with open(optimized_path(internal_links_path), "w") as f:
         for internal_link in internal_urls:
             print(internal_link.strip(), file=f)
 
     # save the external links to a file
-    with open(f"{files_folder}/{domain_name}_external_links.txt", "w") as f:
+    external_links_path = f"{files_folder}/{domain_name}_external_links.txt"
+    with open(optimized_path(external_links_path), "w") as f:
         for external_link in external_urls:
             print(external_link.strip(), file=f)
 
     # save the external links to a file
-    with open(f"{files_folder}/{domain_name}_global.txt", "w") as f:
+    global_path = f"{files_folder}/{domain_name}_global.txt"
+    with open(optimized_path(global_path), "w") as f:
         for external_link in globalData:
             print(external_link.strip(), file=f)
 
-    uniqlines = set(open(f"{files_folder}/{target_domain}_after.txt", 'r', encoding='utf-8').readlines())
-    done_file = open(f"{files_folder}/file_result.txt", 'w', encoding='utf-8').writelines(set(uniqlines))
+    uniqlines = set(open(optimized_path(f"{files_folder}/{target_domain}_after.txt"), 'r', encoding='utf-8').readlines())
+    done_file = open(optimized_path(f"{files_folder}/file_result.txt"), 'w', encoding='utf-8').writelines(set(uniqlines))
 
     print("[?] Taken time:", datetime.now() - start_time)
 
