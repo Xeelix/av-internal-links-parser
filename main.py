@@ -24,7 +24,7 @@ def is_file_existing(file):
 
 if __name__ == "__main__":
     # Libs Installer
-    choice = input("Press Enter...")
+    # choice = input("Press Enter...")
 
     is_initial_file = is_file_existing(links_parser.optimized_path("prefBrowser.txt"))
     if not is_initial_file:
