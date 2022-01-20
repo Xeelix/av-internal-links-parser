@@ -7,19 +7,22 @@ from __dwnldDrivers.versions import *
 ######## I'm not responsible for any loss or damage ########
 ######## caused to you using this script ########
 ######## Github Repo - https://git.io/JJisT/ ########
+from links_parser import optimized_path
+
 
 def install(name):
     subprocess.check_call([sys.executable, '-m', 'pip', 'install', name])
 
-def main():
 
-    my_packages = ['requests', 'clint', 'faker', 'selenium', 'beautifulsoup4', "lxml", "colorama"]
+def main():
+    print("gm")
+    my_packages = ['requests', 'clint', 'faker', 'selenium', 'beautifulsoup4', "lxml", "colorama", "PyInstaller"]
 
     installed_pr = []
 
-    for package in my_packages:
-        install(package)
-        print('\n')
+    # for package in my_packages:
+    #     install(package)
+    #     print('\n')
 
     print('Firefox')
     firefox_ver = get_firefox_version()
@@ -60,12 +63,14 @@ def main():
 
         if userInput <= len(installed_pr) and userInput > 0:
             selected = installed_pr[userInput - 1]
-            fp = open('prefBrowser.txt', 'w')
+            fp = open(optimized_path('prefBrowser.txt'), 'w')
             fp.write(selected.lower())
             inpErr = False
         else:
-             print('Wrong id, Either input 1 or 2')
+            print('Wrong id, Either input 1 or 2')
 
     print('Setup Completed')
+
+
 if __name__ == '__main__':
     main()

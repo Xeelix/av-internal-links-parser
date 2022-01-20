@@ -7,3 +7,6 @@ venv
 *.pyc
 .DS_Store
 /parsed_links/
+/build/
+/dist/
+*.spec

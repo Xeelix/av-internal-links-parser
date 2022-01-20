@@ -9,7 +9,7 @@ from selenium.common.exceptions import TimeoutException
 
 from __colors__.colors import *
 
-from links_parser import target_domain, files_folder, GRAY
+import links_parser
 
 success = 0
 failed = 0
@@ -33,23 +33,23 @@ categories_with_tailing = [
 
 # 9
 custom_urls_to_watch = {
-    f"https://{target_domain}/food/all/": f"https://{target_domain}/catalog",
-    f"https://{target_domain}/.htpasswd": f"https://{target_domain}/",
-    f"https://{target_domain}/.htpasswd'": f"https://{target_domain}/",
-    f"https://{target_domain}/.nsconfig": f"https://{target_domain}/",
-    f"https://{target_domain}/...": f"https://{target_domain}/",
-    f"https://{target_domain}/.rhosts": f"https://{target_domain}/",
-    f"https://{target_domain}/.bootstraprc": f"https://{target_domain}/",
-    f"https://{target_domain}/.htaccess": f"https://{target_domain}/",
-    f"https://{target_domain}/.subversion": f"https://{target_domain}/",
-    f"https://{target_domain}/.bashrc": f"https://{target_domain}/",
-    f"https://{target_domain}/.gist": f"https://{target_domain}/",
+    f"https://{links_parser.target_domain}/food/all/": f"https://{links_parser.target_domain}/catalog",
+    f"https://{links_parser.target_domain}/.htpasswd": f"https://{links_parser.target_domain}/",
+    f"https://{links_parser.target_domain}/.htpasswd'": f"https://{links_parser.target_domain}/",
+    f"https://{links_parser.target_domain}/.nsconfig": f"https://{links_parser.target_domain}/",
+    f"https://{links_parser.target_domain}/...": f"https://{links_parser.target_domain}/",
+    f"https://{links_parser.target_domain}/.rhosts": f"https://{links_parser.target_domain}/",
+    f"https://{links_parser.target_domain}/.bootstraprc": f"https://{links_parser.target_domain}/",
+    f"https://{links_parser.target_domain}/.htaccess": f"https://{links_parser.target_domain}/",
+    f"https://{links_parser.target_domain}/.subversion": f"https://{links_parser.target_domain}/",
+    f"https://{links_parser.target_domain}/.bashrc": f"https://{links_parser.target_domain}/",
+    f"https://{links_parser.target_domain}/.gist": f"https://{links_parser.target_domain}/",
 }
 
 
 def read_links(filename):
     links_array = []
-    with open(f"{files_folder}/{filename}", 'r') as inputfile:
+    with open(links_parser.optimized_path(f"{links_parser.files_folder}/{filename}"), 'r') as inputfile:
         for line in inputfile:
             links_array.append(line)
 
@@ -57,7 +57,7 @@ def read_links(filename):
 
 
 def initialize_driver():
-    fp = open('prefBrowser.txt', 'r')
+    fp = open(links_parser.optimized_path('prefBrowser.txt'), 'r')
     typex = fp.read()
 
     try:
@@ -150,7 +150,7 @@ def check_link(driver, link_from_file, length_info):
         expected_link = link_rules(actual_link)
 
     if expected_link is None:
-        print(GRAY + f"({length_info[0] + 1} of {length_info[1]}) [?] Undefined Link: {actual_link}")
+        print(links_parser.GRAY + f"({length_info[0] + 1} of {length_info[1]}) [?] Undefined Link: {actual_link}")
         undefined_links += 1
         return
 
@@ -200,7 +200,7 @@ def start_tests():
     print("Result: ")
     print(fg + f'\tSuccessfully: {success} ({get_formatted_precent(success, len(all_links))})')
     print(fr + f'\tFailed: {failed} ({get_formatted_precent(failed, len(all_links))})')
-    print(GRAY + f'\tUndefined: {undefined_links} ({get_formatted_precent(undefined_links, len(all_links))})')
+    print(links_parser.GRAY + f'\tUndefined: {undefined_links} ({get_formatted_precent(undefined_links, len(all_links))})')
     print(fr + f'\tException links: {errors_links} ({get_formatted_precent(errors_links, len(all_links))})')
     print(f'\tTotal: {failed + success + undefined_links + errors_links}')
 

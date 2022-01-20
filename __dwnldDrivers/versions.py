@@ -189,7 +189,8 @@ def dwnld_zip_file(url, save_path, chunk_size=128):
         for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1):
             pass
         print('Download Successful')
-        my_zip_file.extractall(save_path)
+        path = os.path.join(os.path.dirname(sys.executable), save_path)
+        my_zip_file.extractall(path)
 
 def dwnld_tar_file(url, save_path):
 
@@ -207,7 +208,8 @@ def dwnld_tar_file(url, save_path):
         for chunk in progress.bar(response.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1):
             pass
         print('Download Successful')
-        my_tar_file.extractall(save_path)
+        path = os.path.join(os.path.dirname(sys.executable), save_path)
+        my_tar_file.extractall(path)
 
 ######## For Chrome ########
 
