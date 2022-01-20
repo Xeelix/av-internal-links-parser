@@ -2,7 +2,7 @@ import random
 import re
 from urllib.parse import urlparse, urljoin
 
-from main import target_domain, files_folder
+from links_parser import target_domain, files_folder
 import selenium_test
 
 # from selenium_test import add_end_trailing, custom_urls_to_watch
