@@ -64,12 +64,12 @@ def initialize_driver():
         driver = None
         # For Chrome
         if typex == 'chrome':
-            driver = webdriver.Chrome(executable_path=r'./webdriver/chromedriver')
+            driver = webdriver.Chrome(executable_path=links_parser.optimized_path(r'./webdriver/chromedriver'))
         # For Firefox
         elif typex == 'firefox':
             # cap = DesiredCapabilities().FIREFOX
             # cap['marionette'] = True
-            driver = webdriver.Firefox(executable_path=r'./webdriver/geckodriver')
+            driver = webdriver.Firefox(executable_path=links_parser.optimized_path(r'./webdriver/geckodriver'))
         elif typex == '':
             print(fr + 'Error - Run setup.py first')
             exit()
@@ -158,12 +158,12 @@ def check_link(driver, link_from_file, length_info):
 
     if actual_link != expected_link:
         print(
-            fr + f"({length_info[0] + 1} of {length_info[1]}) [-] Test failed:\n\texpected: {expected_link}\n\tactual: {actual_link}")
+            fr + f"({length_info[0] + 1} of {length_info[1]}) [-] Test failed:\n\tincome: {link_from_file}\n\texpected: {expected_link}\n\tactual: {actual_link}")
         failed += 1
     else:
         if isCustom: expected_link = link_from_file
         print(
-            fg + f"({length_info[0] + 1} of {length_info[1]}) [+] Test success:\n\texpected: {expected_link}\n\tactual: {actual_link}")
+            fg + f"({length_info[0] + 1} of {length_info[1]}) [+] Test success:\n\tincome: {link_from_file}\n\texpected: {expected_link}\n\tactual: {actual_link}")
         success += 1
 
     return expected_link

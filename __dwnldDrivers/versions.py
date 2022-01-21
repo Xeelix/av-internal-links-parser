@@ -1,6 +1,10 @@
+import stat
 import sys
 import os
 import subprocess
+
+import links_parser
+
 try:
     import requests
 except ImportError:
@@ -11,12 +15,14 @@ import urllib, time
 from io import BytesIO
 from zipfile import ZipFile
 import tarfile
+
 try:
     from clint.textui import progress
 except ImportError:
     subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'clint'])
 finally:
     from clint.textui import progress
+
 
 ######## This script is only for educational purpose ########
 ######## use it on your own RISK ########
@@ -39,6 +45,7 @@ def os_arch():
             os_arch = '32'
     return os_arch
 
+
 def get_platform_architecture_firefox():
     if sys.platform.startswith('linux'):
         platform = 'linux'
@@ -52,6 +59,7 @@ def get_platform_architecture_firefox():
     else:
         raise RuntimeError('Could not determine geckodriver download URL for this platform.')
     return platform, architecture
+
 
 def get_platform_architecture_chrome():
     if sys.platform.startswith('linux') and sys.maxsize > 2 ** 32:
@@ -67,6 +75,7 @@ def get_platform_architecture_chrome():
         raise RuntimeError('Could not determine chromedriver download URL for this platform.')
     return platform, architecture
 
+
 def get_firefox_version():
     """
     :return: the version of firefox installed on client
@@ -80,7 +89,8 @@ def get_firefox_version():
             return None
     elif platform == 'mac':
         try:
-            process = subprocess.Popen(['/Applications/Firefox.app/Contents/MacOS/firefox', '--version'], stdout=subprocess.PIPE)
+            process = subprocess.Popen(['/Applications/Firefox.app/Contents/MacOS/firefox', '--version'],
+                                       stdout=subprocess.PIPE)
             version = process.communicate()[0].decode('UTF-8').replace('Mozilla Firefox', '').strip()
         except:
             return None
@@ -113,7 +123,8 @@ def get_chrome_version():
             return None
     elif platform == 'mac':
         try:
-            process = subprocess.Popen(['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '--version'], stdout=subprocess.PIPE)
+            process = subprocess.Popen(['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '--version'],
+                                       stdout=subprocess.PIPE)
             version = process.communicate()[0].decode('UTF-8').replace('Google Chrome', '').strip()
         except:
             return None
@@ -134,6 +145,7 @@ def get_chrome_version():
         pass
     return version
 
+
 def get_latest_geckodriver_version():
     """
     :return: the latest version of geckodriver
@@ -143,6 +155,7 @@ def get_latest_geckodriver_version():
         return
     return url.split('/')[-1]
 
+
 def get_dwnld_url_firefox(version):
     platform, architecture = get_platform_architecture_firefox()
 
@@ -150,12 +163,15 @@ def get_dwnld_url_firefox(version):
         return 'https://github.com/mozilla/geckodriver/releases/download/' + version + '/geckodriver-' + version + '-' + platform + architecture + '.zip'
     else:
         return 'https://github.com/mozilla/geckodriver/releases/download/' + version + '/geckodriver-' + version + '-' + platform + architecture + '.tar.gz'
+
+
 def get_major_version(version):
     """
     :param version: the version of chrome
     :return: the major version of chrome
     """
     return version.split('.')[0]
+
 
 def get_chrome_driver_v(version):
     """
@@ -164,6 +180,7 @@ def get_chrome_driver_v(version):
     """
     return requests.get('https://chromedriver.storage.googleapis.com/LATEST_RELEASE_' + str(version)).text
 
+
 def get_chrome_driver_dwnld_url(version):
     """
     :param version: the version of webdriver
@@ -171,10 +188,11 @@ def get_chrome_driver_dwnld_url(version):
     """
     platform, architecture = get_platform_architecture_chrome()
 
-    return 'https://chromedriver.storage.googleapis.com/' + str(version) + '/chromedriver_' + platform + str(architecture) + '.zip'
+    return 'https://chromedriver.storage.googleapis.com/' + str(version) + '/chromedriver_' + platform + str(
+        architecture) + '.zip'
+
 
 def dwnld_zip_file(url, save_path, chunk_size=128):
-
     print('Downloading...')
 
     r = requests.get(url)
@@ -186,14 +204,17 @@ def dwnld_zip_file(url, save_path, chunk_size=128):
         exit()
 
     with ZipFile(BytesIO(r.content)) as my_zip_file:
-        for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1):
+        for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length / 1024) + 1):
             pass
         print('Download Successful')
-        path = os.path.join(os.path.dirname(sys.executable), save_path)
+        path = os.path.join(save_path)
         my_zip_file.extractall(path)
 
-def dwnld_tar_file(url, save_path):
+        # st = os.stat(path + "/chromedriver")
+        os.chmod(path + "/chromedriver", 0o777)
 
+
+def dwnld_tar_file(url, save_path):
     print('Downloading...')
 
     response = requests.get(url)
@@ -205,11 +226,12 @@ def dwnld_tar_file(url, save_path):
         exit()
 
     with tarfile.open(fileobj=BytesIO(response.content), mode='r|gz') as my_tar_file:
-        for chunk in progress.bar(response.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1):
+        for chunk in progress.bar(response.iter_content(chunk_size=1024), expected_size=(total_length / 1024) + 1):
             pass
         print('Download Successful')
         path = os.path.join(os.path.dirname(sys.executable), save_path)
         my_tar_file.extractall(path)
+
 
 ######## For Chrome ########
 
@@ -221,7 +243,7 @@ def setup_Chrome(version):
         print('Chrome Driver Version Needed -', chromeDv)
         dwnldLink = get_chrome_driver_dwnld_url(chromeDv)
 
-        dwnld_zip_file(dwnldLink, './webdriver')
+        dwnld_zip_file(dwnldLink, links_parser.optimized_path('webdriver'))
     else:
         print('Chrome is not downloaded')
 
@@ -237,9 +259,9 @@ def setup_Firefox(firefox_ver):
         print('Latest geckodriver version - ' + latestDriverv)
         dwnldLink = get_dwnld_url_firefox(latestDriverv)
         if dwnldLink.endswith('.tar.gz'):
-            dwnld_tar_file(dwnldLink, './webdriver')
+            dwnld_tar_file(dwnldLink, links_parser.optimized_path('webdriver'))
         else:
             pass
-            dwnld_zip_file(dwnldLink, './webdriver')
+            dwnld_zip_file(dwnldLink, links_parser.optimized_path('webdriver'))
     else:
         print('Firefox is not installed')
