@@ -62,6 +62,10 @@ def initialize_driver():
 
     try:
         driver = None
+
+        # For Safari
+        if typex == 'darwin':
+            driver = webdriver.Safari()
         # For Chrome
         if typex == 'chrome':
             driver = webdriver.Chrome(executable_path=links_parser.optimized_path(r'./webdriver/chromedriver'))

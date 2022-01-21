@@ -11,6 +11,7 @@ def print_menu():
     ----------------------
     1. Restart parser
     2. Start Selenium
+    3. Change webdriver
     ----------------------
     """
     print(menu)
@@ -34,10 +35,6 @@ if __name__ == "__main__":
     if not is_initial_file:
         install.main()  # Installer
 
-        links_parser.parse()  # Parser links start
-
-        links_filter.generate_filtered_file()  # Apply filter
-
     loop = True
     while loop:
         print_menu()
@@ -49,3 +46,5 @@ if __name__ == "__main__":
             links_filter.generate_filtered_file()  # Apply filter
         elif choice == 2:
             selenium_test.start_test()
+        elif choice == 3:
+            install.main()  # Installer
