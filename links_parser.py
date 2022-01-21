@@ -16,6 +16,8 @@ from threading import Thread
 from requests import ConnectTimeout
 from urllib3.exceptions import ConnectTimeoutError
 
+FILENAME_PARSED_LINKS = "all_links.txt"
+
 files_folder = "parsed_links"
 target_domain = "stage.av.ru"
 
@@ -204,8 +206,15 @@ def parse():
         for external_link in globalData:
             print(external_link.strip(), file=f)
 
-    uniqlines = set(open(optimized_path(f"{files_folder}/{target_domain}_after.txt"), 'r', encoding='utf-8').readlines())
-    done_file = open(optimized_path(f"{files_folder}/file_result.txt"), 'w', encoding='utf-8').writelines(set(uniqlines))
+    uniqlines = set(
+        open(optimized_path(f"{files_folder}/{target_domain}_after.txt"), 'r', encoding='utf-8').readlines())
+    done_file = open(optimized_path(f"{files_folder}/{FILENAME_PARSED_LINKS}"), 'w',
+                     encoding='utf-8').writelines(set(uniqlines))
+
+    os.remove(optimized_path(internal_links_path))
+    os.remove(optimized_path(external_links_path))
+    os.remove(optimized_path(global_path))
+    os.remove(optimized_path(f"{files_folder}/{target_domain}_after.txt"))
 
     print("[?] Taken time:", datetime.now() - start_time)
 

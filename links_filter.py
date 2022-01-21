@@ -7,7 +7,6 @@ import selenium_test
 
 # from selenium_test import add_end_trailing, custom_urls_to_watch
 
-FILE_NAME = "file_result.txt"
 MAX_REPEATS_COUNT = 5
 
 upper_case_count = -10
@@ -237,7 +236,7 @@ def add_uppercase_links_to_array(links):
 
 
 def generate_filtered_file():
-    all_links = set(open(links_parser.optimized_path(f"{links_parser.files_folder}/{FILE_NAME}"), 'r',
+    all_links = set(open(links_parser.optimized_path(f"{links_parser.files_folder}/{links_parser.FILENAME_PARSED_LINKS}"), 'r',
                          encoding='utf-8').readlines())
     all_links = clear_repeating_links(all_links)
     all_links = remove_trailing_slash_in_list(all_links)
