@@ -1,5 +1,6 @@
 import subprocess
 import sys
+from sys import platform
 from __dwnldDrivers.versions import *
 
 ######## This script is only for educational purpose ########
@@ -22,6 +23,10 @@ def main():
     # for package in my_packages:
     #     install(package)
     #     print('\n')
+    if platform == "darwin":
+        print('Safari\n')
+        installed_pr.append('Darwin')   
+        print     
 
     print('Firefox')
     firefox_ver = get_firefox_version()
@@ -51,13 +56,14 @@ def main():
 
     print('\nWich browser do you prefer to run script on')
 
+    print(installed_pr)
     for index, pr in enumerate(installed_pr, start=1):
         print('\n[*] ' + str(index) + ' ' + pr)
 
     inpErr = True
 
     while inpErr != False:
-        print('\nEnter id ex - 1 or 2: ', end='')
+        print(f'\nEnter id ex - 1 or {len(installed_pr)}: ', end='')
         userInput = int(input())
 
         if userInput <= len(installed_pr) and userInput > 0:
@@ -66,7 +72,7 @@ def main():
             fp.write(selected.lower())
             inpErr = False
         else:
-            print('Wrong id, Either input 1 or 2')
+            print(f'Wrong id, Either input 1 or {len(installed_pr)}')
 
     print('Setup Completed')
 
