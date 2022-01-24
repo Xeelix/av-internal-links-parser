@@ -9,8 +9,9 @@ import selenium_test
 def print_menu():
     menu = """
     ----------------------
-    1. Restart parser
+    1. Start parser
     2. Start Selenium
+    
     3. Change webdriver
     ----------------------
     """
@@ -38,7 +39,7 @@ if __name__ == "__main__":
     loop = True
     while loop:
         print_menu()
-        choice = input("Enter your choice [1-2]: ")
+        choice = input("Enter your choice [1-3]: ")
         choice = int(choice)
 
         if choice == 1:

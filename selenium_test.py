@@ -57,8 +57,14 @@ def read_links(filename):
 
 
 def initialize_driver():
-    fp = open(links_parser.optimized_path('prefBrowser.txt'), 'r')
-    typex = fp.read()
+    file_array = []
+    with open(links_parser.optimized_path('prefBrowser.txt'), 'r') as inputfile:
+        for line in inputfile:
+            file_array.append(line)
+
+    typex = ""
+    # if len(file_array) == 2:
+    typex = file_array[0]
 
     try:
         driver = None
@@ -196,7 +202,7 @@ def start_tests():
             errors_links += 1
             continue
         except Exception as e:
-            print(e)
+            print(f"{e} - link: {link}")
             errors_links += 1
             continue
 

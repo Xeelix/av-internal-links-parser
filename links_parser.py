@@ -19,7 +19,8 @@ from urllib3.exceptions import ConnectTimeoutError
 FILENAME_PARSED_LINKS = "all_links.txt"
 
 files_folder = "parsed_links"
-target_domain = "stage.av.ru"
+# target_domain = "stage.av.ru"
+target_domain = ""
 
 colorama.init()
 
@@ -160,10 +161,35 @@ def optimized_path(save_path):
     return os.path.join(os.path.dirname(sys.executable), save_path)
 
 
+def set_target_domain(new_domain):
+    global target_domain
+    old_data = open(optimized_path('prefBrowser.txt'), 'r', encoding='utf-8').readlines()
+    # breakpoint()
+
+    loop = True
+    while loop:
+        if len(old_data) <= 2:
+            message = """
+Select url to parse:
+    [1] - av.ru
+    [2] - stage.av.ru\n
+"""
+            # old_data = input("Select domain")
+            choice = int(input(message))
+
+            if choice == 1:
+                target_domain = "av.ru"
+                return
+            elif choice == 2:
+                target_domain = "stage.av.ru"
+                return
+
+
 def parse():
     start_time = datetime.now()
 
     check_directory_existing_and_create(files_folder)
+    set_target_domain("av.ru")
 
     # save the external links to a file
     with open(optimized_path(f"{files_folder}/{target_domain}_after.txt"), "w") as f:
