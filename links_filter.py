@@ -238,8 +238,7 @@ def add_uppercase_links_to_array(links):
 
 def generate_filtered_file():
     print()
-    all_links = set(open(links_parser.optimized_path(os.path.join(links_parser.files_folder, links_parser.FILENAME_PARSED_LINKS)), 'r',
-                         encoding='utf-8').readlines())
+    all_links = set(open(links_parser.optimized_path(os.path.join(links_parser.files_folder, links_parser.FILENAME_PARSED_LINKS)), 'r').readlines())
     all_links = clear_repeating_links(all_links)
     all_links = remove_trailing_slash_in_list(all_links)
     all_links = set(filter_only_one_domain(all_links))
