@@ -11,18 +11,9 @@ from __dwnldDrivers.versions import *
 from links_parser import optimized_path
 
 
-def install(name):
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', name])
-
-
 def main():
-    my_packages = ['requests', 'clint', 'faker', 'selenium', 'beautifulsoup4', "lxml", "colorama", "PyInstaller"]
-
     installed_pr = []
 
-    # for package in my_packages:
-    #     install(package)
-    #     print('\n')
     if platform == "darwin":
         print('Safari\n')
         installed_pr.append('Darwin')   
