@@ -163,7 +163,7 @@ def optimized_path(save_path):
 
 def set_target_domain(new_domain):
     global target_domain
-    old_data = open(optimized_path('prefBrowser.txt'), 'r', encoding='utf-8').readlines()
+    old_data = open(optimized_path('prefBrowser.txt'), 'r').readlines()
     # breakpoint()
 
     loop = True
@@ -236,9 +236,8 @@ def parse():
 
 
     uniqlines = set(
-        open(optimized_path(os.path.join(files_folder, f"{target_domain}_after.txt")), 'r', encoding='utf-8').readlines())
-    done_file = open(optimized_path(os.path.join(files_folder, FILENAME_PARSED_LINKS)), 'w',
-                     encoding='utf-8').writelines(set(uniqlines))
+        open(optimized_path(os.path.join(files_folder, f"{target_domain}_after.txt")), 'r').readlines())
+    done_file = open(optimized_path(os.path.join(files_folder, FILENAME_PARSED_LINKS)), 'w').writelines(set(uniqlines))
 
     os.remove(optimized_path(internal_links_path))
     os.remove(optimized_path(external_links_path))
