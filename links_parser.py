@@ -215,32 +215,35 @@ def parse():
     domain_name = urlparse(url).netloc
 
     # save the internal links to a file
-    internal_links_path = f"{files_folder}/{domain_name}_internal_links.txt"
+    
+    internal_links_path = os.path.join(files_folder, f"{domain_name}_internal_links.txt")
     with open(optimized_path(internal_links_path), "w") as f:
         for internal_link in internal_urls:
             print(internal_link.strip(), file=f)
 
     # save the external links to a file
-    external_links_path = f"{files_folder}/{domain_name}_external_links.txt"
+    external_links_path = os.path.join(files_folder, f"{domain_name}_external_links.txt")
     with open(optimized_path(external_links_path), "w") as f:
         for external_link in external_urls:
             print(external_link.strip(), file=f)
 
+    
     # save the external links to a file
-    global_path = f"{files_folder}/{domain_name}_global.txt"
+    global_path = os.path.join(files_folder, f"{domain_name}_global.txt")
     with open(optimized_path(global_path), "w") as f:
         for external_link in globalData:
             print(external_link.strip(), file=f)
 
+
     uniqlines = set(
-        open(optimized_path(f"{files_folder}/{target_domain}_after.txt"), 'r', encoding='utf-8').readlines())
-    done_file = open(optimized_path(f"{files_folder}/{FILENAME_PARSED_LINKS}"), 'w',
+        open(optimized_path(os.path.join(files_folder, f"{target_domain}_after.txt")), 'r', encoding='utf-8').readlines())
+    done_file = open(optimized_path(os.path.join(files_folder, FILENAME_PARSED_LINKS)), 'w',
                      encoding='utf-8').writelines(set(uniqlines))
 
     os.remove(optimized_path(internal_links_path))
     os.remove(optimized_path(external_links_path))
     os.remove(optimized_path(global_path))
-    os.remove(optimized_path(f"{files_folder}/{target_domain}_after.txt"))
+    os.remove(optimized_path(os.path.join(files_folder, f"{target_domain}_after.txt")))
 
     print("[?] Taken time:", datetime.now() - start_time)
 

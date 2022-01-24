@@ -1,5 +1,6 @@
 import random
 import re
+import os
 from urllib.parse import urlparse, urljoin
 
 import links_parser
@@ -236,7 +237,8 @@ def add_uppercase_links_to_array(links):
 
 
 def generate_filtered_file():
-    all_links = set(open(links_parser.optimized_path(f"{links_parser.files_folder}/{links_parser.FILENAME_PARSED_LINKS}"), 'r',
+    print()
+    all_links = set(open(links_parser.optimized_path(os.path.join(links_parser.files_folder, links_parser.FILENAME_PARSED_LINKS)), 'r',
                          encoding='utf-8').readlines())
     all_links = clear_repeating_links(all_links)
     all_links = remove_trailing_slash_in_list(all_links)
@@ -246,7 +248,8 @@ def generate_filtered_file():
     all_links = add_indexing_links_to_array(all_links)
     all_links = add_uppercase_links_to_array(all_links)
 
-    with open(links_parser.optimized_path(f"{links_parser.files_folder}/filtered_links.txt"), "w") as f:
+
+    with open(links_parser.optimized_path(os.path.join(links_parser.files_folder, "filtered_links.txt")), "w") as f:
         for external_link in all_links:
             print(external_link.strip(), file=f)
 
