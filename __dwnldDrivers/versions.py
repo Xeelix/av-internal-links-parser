@@ -211,7 +211,8 @@ def dwnld_zip_file(url, save_path, chunk_size=128):
         my_zip_file.extractall(path)
 
         # st = os.stat(path + "/chromedriver")
-        os.chmod(path + "/chromedriver", 0o777)
+        if sys.platform == "darwin" or sys.platform == "lunux":
+            os.chmod(path + "/chromedriver", 0o777)
 
 
 def dwnld_tar_file(url, save_path):
