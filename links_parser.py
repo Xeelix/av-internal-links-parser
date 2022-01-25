@@ -1,4 +1,5 @@
 import codecs
+import multiprocessing
 import os
 import shutil
 import sys
@@ -30,7 +31,7 @@ RESET = colorama.Fore.RESET
 YELLOW = colorama.Fore.YELLOW
 RED = colorama.Fore.RED
 
-THREADS_COUNT = 10
+THREADS_COUNT = round(multiprocessing.cpu_count() * 2.5)
 
 # initialize the set of links (unique links)
 internal_urls = set()
@@ -161,35 +162,57 @@ def optimized_path(save_path):
     return os.path.join(os.path.dirname(sys.executable), save_path)
 
 
-def set_target_domain(new_domain):
+def get_target_domain():
+    rows = open(optimized_path('prefBrowser.txt'), 'r').readlines()
+    curr_domain = None
+    try:
+        curr_domain = rows[1]
+    except Exception as e:
+        pass
+
+    return curr_domain
+
+
+def set_target_domain():
     global target_domain
-    old_data = open(optimized_path('prefBrowser.txt'), 'r').readlines()
+
+    rows = open(optimized_path('prefBrowser.txt'), 'r').readlines()
+    domain_file = get_target_domain()
     # breakpoint()
 
     loop = True
     while loop:
-        if len(old_data) <= 2:
-            message = """
+        message = """
 Select url to parse:
-    [1] - av.ru
-    [2] - stage.av.ru\n
+[1] - av.ru
+[2] - stage.av.ru\n
 """
-            # old_data = input("Select domain")
-            choice = int(input(message))
+        # old_data = input("Select domain")
+        choice = int(input(message))
 
-            if choice == 1:
-                target_domain = "av.ru"
-                return
-            elif choice == 2:
-                target_domain = "stage.av.ru"
-                return
+        if choice == 1:
+            target_domain = "av.ru"
+        elif choice == 2:
+            target_domain = "stage.av.ru"
+
+        if target_domain:
+            if domain_file:
+                with open(optimized_path('prefBrowser.txt'), "w") as f:
+                    f.write(rows[0])
+                    f.write(target_domain)
+            else:
+                with open(optimized_path('prefBrowser.txt'), "a") as f:
+                    f.write("\n" + target_domain)
+
+        return
 
 
 def parse():
     start_time = datetime.now()
+    print(f"Pool count: {THREADS_COUNT}")
 
     check_directory_existing_and_create(files_folder)
-    set_target_domain("av.ru")
+    set_target_domain()
 
     # save the external links to a file
     with open(optimized_path(f"{files_folder}/{target_domain}_after.txt"), "w") as f:
@@ -215,7 +238,7 @@ def parse():
     domain_name = urlparse(url).netloc
 
     # save the internal links to a file
-    
+
     internal_links_path = os.path.join(files_folder, f"{domain_name}_internal_links.txt")
     with open(optimized_path(internal_links_path), "w") as f:
         for internal_link in internal_urls:
@@ -227,13 +250,11 @@ def parse():
         for external_link in external_urls:
             print(external_link.strip(), file=f)
 
-    
     # save the external links to a file
     global_path = os.path.join(files_folder, f"{domain_name}_global.txt")
     with open(optimized_path(global_path), "w") as f:
         for external_link in globalData:
             print(external_link.strip(), file=f)
-
 
     uniqlines = set(
         open(optimized_path(os.path.join(files_folder, f"{target_domain}_after.txt")), 'r').readlines())
