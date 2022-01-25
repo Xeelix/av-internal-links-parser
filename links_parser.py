@@ -161,16 +161,18 @@ def optimized_path(save_path):
 
 
 def get_target_domain():
-    rows = open(optimized_path('prefBrowser.txt'), 'r').readlines()
     curr_domain = None
     try:
+        rows = open(optimized_path('prefBrowser.txt'), 'r').readlines()
         curr_domain = rows[1]
     except Exception as e:
         pass
 
     return curr_domain
 
+
 target_domain = get_target_domain()
+
 
 def set_target_domain():
     global target_domain
