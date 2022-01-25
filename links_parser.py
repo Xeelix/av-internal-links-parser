@@ -1,27 +1,24 @@
-import codecs
 import multiprocessing
-import os
-import shutil
-import sys
-from datetime import datetime
-import time
-from multiprocessing import Pool
-
 import requests
-from urllib.parse import urlparse, urljoin
-from bs4 import BeautifulSoup
 import colorama
-from threading import Thread
+import codecs
+import shutil
+import time
+import sys
+import os
 
-# init the colorama module
-from requests import ConnectTimeout
 from urllib3.exceptions import ConnectTimeoutError
+from urllib.parse import urlparse, urljoin
+from requests import ConnectTimeout
+from multiprocessing import Pool
+from datetime import datetime
+from bs4 import BeautifulSoup
+from threading import Thread
 
 FILENAME_PARSED_LINKS = "all_links.txt"
 
 files_folder = "parsed_links"
 # target_domain = "stage.av.ru"
-target_domain = ""
 
 colorama.init()
 
@@ -70,11 +67,12 @@ def get_all_website_links(url):
     Returns all URLs that is found on `url` in which it belongs to the same website
     """
     # all URLs of `url`
-    global isProductParsed
+    global isProductParsed, target_domain, total_urls_visited, visited_products
     urls = set()
     # domain name of the URL without the protocol
     domain_name = urlparse(url).netloc
-    soup = BeautifulSoup(requests.get(url, timeout=(10, 15)).content, "html.parser")
+    soup = BeautifulSoup(requests.get(
+        url, timeout=(10, 15)).content, "html.parser")
     for a_tag in soup.findAll("a"):
         href = a_tag.attrs.get("href")
         if href == "" or href is None:
@@ -121,7 +119,7 @@ def crawl(url, max_urls=40):
     params:
         max_urls (int): number of max urls to crawl, default is 30.
     """
-    global total_urls_visited, visited_products
+    global total_urls_visited, visited_products, target_domain
 
     for itemCatalog in skipped:
         if itemCatalog in url:
@@ -172,12 +170,13 @@ def get_target_domain():
 
     return curr_domain
 
+target_domain = get_target_domain()
 
 def set_target_domain():
     global target_domain
 
     rows = open(optimized_path('prefBrowser.txt'), 'r').readlines()
-    domain_file = get_target_domain()
+    target_domain = domain_file = get_target_domain()
     # breakpoint()
 
     loop = True
@@ -204,16 +203,18 @@ Select url to parse:
                 with open(optimized_path('prefBrowser.txt'), "a") as f:
                     f.write("\n" + target_domain)
 
-        return
+        return target_domain
 
 
 def parse():
+    global target_domain
+
     start_time = datetime.now()
     print(f"Pool count: {THREADS_COUNT}")
 
     check_directory_existing_and_create(files_folder)
-    set_target_domain()
-
+    domain_to_parse = set_target_domain()
+    print(domain_to_parse)
     # save the external links to a file
     with open(optimized_path(f"{files_folder}/{target_domain}_after.txt"), "w") as f:
         print(f"{GRAY}[+] File was updated{RESET}")
@@ -239,13 +240,15 @@ def parse():
 
     # save the internal links to a file
 
-    internal_links_path = os.path.join(files_folder, f"{domain_name}_internal_links.txt")
+    internal_links_path = os.path.join(
+        files_folder, f"{domain_name}_internal_links.txt")
     with open(optimized_path(internal_links_path), "w") as f:
         for internal_link in internal_urls:
             print(internal_link.strip(), file=f)
 
     # save the external links to a file
-    external_links_path = os.path.join(files_folder, f"{domain_name}_external_links.txt")
+    external_links_path = os.path.join(
+        files_folder, f"{domain_name}_external_links.txt")
     with open(optimized_path(external_links_path), "w") as f:
         for external_link in external_urls:
             print(external_link.strip(), file=f)
@@ -258,12 +261,14 @@ def parse():
 
     uniqlines = set(
         open(optimized_path(os.path.join(files_folder, f"{target_domain}_after.txt")), 'r').readlines())
-    done_file = open(optimized_path(os.path.join(files_folder, FILENAME_PARSED_LINKS)), 'w').writelines(set(uniqlines))
+    done_file = open(optimized_path(os.path.join(
+        files_folder, FILENAME_PARSED_LINKS)), 'w').writelines(set(uniqlines))
 
     os.remove(optimized_path(internal_links_path))
     os.remove(optimized_path(external_links_path))
     os.remove(optimized_path(global_path))
-    os.remove(optimized_path(os.path.join(files_folder, f"{target_domain}_after.txt")))
+    os.remove(optimized_path(os.path.join(
+        files_folder, f"{target_domain}_after.txt")))
 
     print("[?] Taken time:", datetime.now() - start_time)
 
