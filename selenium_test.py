@@ -64,7 +64,7 @@ def initialize_driver():
 
     typex = ""
     # if len(file_array) == 2:
-    typex = file_array[0]
+    typex = file_array[0].strip()
 
     try:
         driver = None
