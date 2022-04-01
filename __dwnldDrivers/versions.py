@@ -3,7 +3,7 @@ import sys
 import os
 import subprocess
 
-import links_parser
+from helper import optimized_path
 
 try:
     import requests
@@ -244,7 +244,7 @@ def setup_Chrome(version):
         print('Chrome Driver Version Needed -', chromeDv)
         dwnldLink = get_chrome_driver_dwnld_url(chromeDv)
 
-        dwnld_zip_file(dwnldLink, links_parser.optimized_path('webdriver'))
+        dwnld_zip_file(dwnldLink, optimized_path('webdriver'))
     else:
         print('Chrome is not downloaded')
 
@@ -260,9 +260,9 @@ def setup_Firefox(firefox_ver):
         print('Latest geckodriver version - ' + latestDriverv)
         dwnldLink = get_dwnld_url_firefox(latestDriverv)
         if dwnldLink.endswith('.tar.gz'):
-            dwnld_tar_file(dwnldLink, links_parser.optimized_path('webdriver'))
+            dwnld_tar_file(dwnldLink, optimized_path('webdriver'))
         else:
             pass
-            dwnld_zip_file(dwnldLink, links_parser.optimized_path('webdriver'))
+            dwnld_zip_file(dwnldLink, optimized_path('webdriver'))
     else:
         print('Firefox is not installed')
