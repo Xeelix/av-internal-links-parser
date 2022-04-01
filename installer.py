@@ -40,7 +40,7 @@ class Installer:
         print('\nChrome')
         chrome_ver = get_chrome_version()
 
-        if chrome_ver != None:
+        if chrome_ver is not None:
             is_chrome_there = 1
             Installer.installed_pr.append('Chrome')
             setup_Chrome(chrome_ver)
@@ -61,11 +61,11 @@ class Installer:
 
         inpErr = True
 
-        while inpErr != False:
+        while inpErr:
             print(f'\nEnter id ex - 1 or {len(Installer.installed_pr)}: ', end='')
             userInput = int(input())
 
-            if userInput <= len(Installer.installed_pr) and userInput > 0:
+            if len(Installer.installed_pr) >= userInput > 0:
                 selected = Installer.installed_pr[userInput - 1]
                 fp = open(optimized_path('prefBrowser.txt'), 'w')
                 fp.write(selected.lower())
