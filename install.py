@@ -16,8 +16,7 @@ def main():
 
     if platform == "darwin":
         print('Safari\n')
-        installed_pr.append('Darwin')   
-        print     
+        installed_pr.append('Darwin')
 
     print('Firefox')
     firefox_ver = get_firefox_version()
