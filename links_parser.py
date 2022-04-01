@@ -157,7 +157,7 @@ def check_directory_existing_and_create(directory):
 
 
 def optimized_path(save_path):
-    return os.path.join(os.path.dirname(sys.executable), save_path)
+    return os.path.join(os.curdir, save_path)
 
 
 def get_target_domain():
