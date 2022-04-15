@@ -1,7 +1,10 @@
 /.idea/
 venv
 /webdriver/
+
 *.txt
+!requirenments.txt
+
 *.log
 /.pytest_cache/
 *.pyc

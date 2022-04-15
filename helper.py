@@ -2,7 +2,7 @@ import multiprocessing
 import os
 import shutil
 
-import colorama
+# import colorama
 
 
 def optimized_path(save_path):
@@ -16,8 +16,11 @@ def check_directory_existing_and_create(directory):
     os.makedirs(directory)
 
 
-threads_count = round(multiprocessing.cpu_count() * 2.5)
+threads_count = round(multiprocessing.cpu_count() * 1.7)
 filename_parsed_links = "all_links.txt"
 files_folder = "parsed_links"
 
-colorama.init()
+keyword_to_parse = ""
+find_hrefs_path = "find_hrefs.txt"
+
+# colorama.init()

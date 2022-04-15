@@ -1,6 +1,7 @@
 import multiprocessing
 import requests
 import colorama
+
 import helper
 import codecs
 import shutil
@@ -72,6 +73,7 @@ class LinksParser:
         """
             Returns all URLs that is found on `url` in which it belongs to the same website
             """
+        keyword = helper.keyword_to_parse
         # all URLs of `url`
         # global isProductParsed, target_domain, total_urls_visited, visited_products
         urls = set()
@@ -100,12 +102,21 @@ class LinksParser:
             #     continue
             if "/i/" in href:
                 isProductParsed = True
+
+            if keyword in href:
+                msg = f"{keyword} [href] on {url}"
+                print(msg)
+                with open(optimized_path(os.path.join(helper.files_folder, helper.find_hrefs_path)),
+                          "a") as f:
+                    f.write(f"{msg}\n")
+
             if domain_name not in href:
                 # external link
                 if href not in self.external_urls:
                     print(f"{GRAY}[!] External link: {href}{RESET}")
                     self.external_urls.add(href)
                 continue
+
             print(f"{GREEN}[*] Internal link: {href}{RESET}")
 
             urls.add(href)
@@ -164,6 +175,9 @@ class LinksParser:
         with open(optimized_path(os.path.join(helper.files_folder, f"{self.target_domain}_after.txt")), "w") as f:
             print(f"{GRAY}[+] File was updated{RESET}")
 
+        with open(optimized_path(os.path.join(helper.files_folder, helper.find_hrefs_path)), "w") as f:
+            pass
+
         url = f"https://{self.target_domain}"
         first_wave_links = self.get_all_link_on_url(url)
 
@@ -207,6 +221,15 @@ class LinksParser:
         done_file = open(optimized_path(os.path.join(
             helper.files_folder, helper.filename_parsed_links)), 'w').writelines(set(uniqlines))
 
+        unique_keywords = set(
+            open(optimized_path(os.path.join(helper.files_folder, helper.find_hrefs_path)), 'r').readlines())
+
+        print("\nFound keywords:")
+        for word in unique_keywords:
+            print(f"{word}")
+        print("\n")
+
+        # os.remove(optimized_path(os.path.join(helper.files_folder, helper.find_hrefs_path)))
         os.remove(optimized_path(internal_links_path))
         os.remove(optimized_path(external_links_path))
         os.remove(optimized_path(global_path))
@@ -217,5 +240,7 @@ class LinksParser:
 
 
 if __name__ == "__main__":
+    helper.keyword_to_parse = input("Input keyword: ")
+
     lp = LinksParser()
     lp.parse()
