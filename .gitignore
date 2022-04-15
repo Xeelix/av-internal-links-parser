@@ -4,6 +4,7 @@ venv
 
 *.txt
 !requirenments.txt
+!av_instruction.txt
 
 *.log
 /.pytest_cache/

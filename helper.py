@@ -21,6 +21,6 @@ filename_parsed_links = "all_links.txt"
 files_folder = "parsed_links"
 
 keyword_to_parse = ""
-find_hrefs_path = "find_hrefs.txt"
+find_hrefs_path = "found_hrefs.txt"
 
 # colorama.init()
