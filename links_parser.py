@@ -224,12 +224,16 @@ class LinksParser:
         unique_keywords = set(
             open(optimized_path(os.path.join(helper.files_folder, helper.find_hrefs_path)), 'r').readlines())
 
+        os.remove(optimized_path(os.path.join(helper.files_folder, helper.find_hrefs_path)))
         print("\nFound keywords:")
-        for word in unique_keywords:
-            print(f"{word}")
+        for msg in unique_keywords:
+            print(f"{msg}")
+            with open(optimized_path(os.path.join(helper.files_folder, helper.find_hrefs_path)),
+                      "a+") as f:
+                f.write(f"{msg}")
+
         print("\n")
 
-        # os.remove(optimized_path(os.path.join(helper.files_folder, helper.find_hrefs_path)))
         os.remove(optimized_path(internal_links_path))
         os.remove(optimized_path(external_links_path))
         os.remove(optimized_path(global_path))
