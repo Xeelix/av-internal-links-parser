@@ -57,10 +57,10 @@ class LinksParser:
         self.target_domain = None
         self.url = None
 
-    def fill_target_domain(self):
+    def set_target_domain(self, value):
         # TODO: Complete read from file target domains
         # self.target_domain = input("Paste target domain: ")
-        self.target_domain = "av.ru"
+        self.target_domain = value
 
     def is_valid(self, url):
         """
@@ -73,7 +73,7 @@ class LinksParser:
         """
             Returns all URLs that is found on `url` in which it belongs to the same website
             """
-        keyword = helper.keyword_to_parse
+        keyword = self.keyword_to_parse
         # all URLs of `url`
         # global isProductParsed, target_domain, total_urls_visited, visited_products
         urls = set()
@@ -167,10 +167,13 @@ class LinksParser:
         start_time = datetime.now()
         print(f"Pool count: {helper.threads_count}")
 
+        keyword_to_parse = input("Input keyword: ")
+        self.keyword_to_parse = keyword_to_parse
+
         helper.check_directory_existing_and_create(helper.files_folder)
 
         # TODO: Realize to target domain fill
-        self.fill_target_domain()
+        self.set_target_domain(input("Input target domain: "))
 
         with open(optimized_path(os.path.join(helper.files_folder, f"{self.target_domain}_after.txt")), "w") as f:
             print(f"{GRAY}[+] File was updated{RESET}")
@@ -244,7 +247,8 @@ class LinksParser:
 
 
 if __name__ == "__main__":
-    helper.keyword_to_parse = input("Input keyword: ")
+    # Pyinstaller fix
+    multiprocessing.freeze_support()
 
     lp = LinksParser()
     lp.parse()
