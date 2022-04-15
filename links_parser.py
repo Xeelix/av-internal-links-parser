@@ -165,15 +165,17 @@ class LinksParser:
 
     def parse(self):
         start_time = datetime.now()
-        print(f"Pool count: {helper.threads_count}")
+        print(f"Pool count: {helper.threads_count}\n")
 
+        target_domain = input("Input target domain: ")
         keyword_to_parse = input("Input keyword: ")
+
         self.keyword_to_parse = keyword_to_parse
 
         helper.check_directory_existing_and_create(helper.files_folder)
 
         # TODO: Realize to target domain fill
-        self.set_target_domain(input("Input target domain: "))
+        self.set_target_domain(target_domain)
 
         with open(optimized_path(os.path.join(helper.files_folder, f"{self.target_domain}_after.txt")), "w") as f:
             print(f"{GRAY}[+] File was updated{RESET}")
@@ -246,9 +248,17 @@ class LinksParser:
         print("[?] Taken time:", datetime.now() - start_time)
 
 
+def print_info():
+    print('''
+target domain - Основной домен, на котором будет происходить поиск ссылок
+keyword - Ключевое слово для поиска на странице
+    ''')
+
+
 if __name__ == "__main__":
     # Pyinstaller fix
     multiprocessing.freeze_support()
+    print_info()
 
     lp = LinksParser()
     lp.parse()
