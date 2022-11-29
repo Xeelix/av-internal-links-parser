@@ -231,7 +231,26 @@ def dwnld_tar_file(url, save_path):
             pass
         print('Download Successful')
         path = os.path.join(os.path.dirname(sys.executable), save_path)
-        my_tar_file.extractall(path)
+        def is_within_directory(directory, target):
+            
+            abs_directory = os.path.abspath(directory)
+            abs_target = os.path.abspath(target)
+        
+            prefix = os.path.commonprefix([abs_directory, abs_target])
+            
+            return prefix == abs_directory
+        
+        def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+        
+            for member in tar.getmembers():
+                member_path = os.path.join(path, member.name)
+                if not is_within_directory(path, member_path):
+                    raise Exception("Attempted Path Traversal in Tar File")
+        
+            tar.extractall(path, members, numeric_owner=numeric_owner) 
+            
+        
+        safe_extract(my_tar_file, path)
 
 
 ######## For Chrome ########
